@@ -51,15 +51,33 @@ class ApplicativeFunctorTest extends PlaySpec with GuiceOneAppPerTest with Injec
     }
 
     "applicatives with zip with and apply over" in {
-      val function: Int => Int => String => String = { (x: Int) => y: Int => z: String => s"$x - $y - $z" }
-      val f1 = Future(3)
-      val f2 = Future(4)
-      val f3 = Future("5")
+      val function = { x: Int => y: Int => z: String => x1: Int => s"$x - $y - $z - $x1" }
+      val f1 = Future {
+        Thread.sleep(1000)
+        println("Waiting for 1")
+        1
+      }
+      val f2 = Future {
+        Thread.sleep(3000)
+        println("Waiting for 2")
+        2
+      }
+      val f3 = Future {
+        Thread.sleep(1000)
+        println("Waiting for 3")
+        "3"
+      }
+      val f4 = Future {
+        Thread.sleep(2000)
+        println("Waiting for 4")
+        4
+      }
 
       val applicativeResult = Future(function)
-        .zipOver(f1)
+        .applyOver(f1)
         .applyOver(f2)
-        .zipOver(f3)
+        .applyOver(f3)
+        .applyOver(f4)
 
       val result = Await.result(
         applicativeResult, 10 seconds
