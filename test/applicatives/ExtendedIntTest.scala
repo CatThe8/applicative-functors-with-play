@@ -1,6 +1,6 @@
 package applicatives
 
-import model.applicatives.implicits.extendInt
+import model.applicatives.ImplicitsInt.extendInt
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.test.Injecting

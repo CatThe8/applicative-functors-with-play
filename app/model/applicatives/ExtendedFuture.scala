@@ -13,6 +13,6 @@ class ExtendedFuture[A, B](applicativeFunctor: Future[A => B]) {
     zipWith(other)({ (f: A => B, r: A) => f(r) })
 }
 
-object implicits {
-  implicit def extendedFuture[A, B](f: A => B): Future[A => B] = Future(f)
+object ImplicitsFutures {
+  implicit def extendedFuture[A, B](f: Future[A => B]): ExtendedFuture[A, B] = new ExtendedFuture(f)
 }

@@ -7,6 +7,6 @@ class ExtendedInt(value: Int) {
 
 }
 
-object implicits {
+object ImplicitsInt {
   implicit def extendInt(i: Int): ExtendedInt = new ExtendedInt(i)
 }
