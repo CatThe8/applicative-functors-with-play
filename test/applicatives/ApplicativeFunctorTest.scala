@@ -12,18 +12,39 @@ import scala.language.{implicitConversions, postfixOps}
 
 class ApplicativeFunctorTest extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
-  "HomeController GET" should {
+  private val future1 = Future {
+    Thread.sleep(1000)
+    println("Waiting for 1")
+    1
+  }
+
+  private val future2 = Future {
+    Thread.sleep(3000)
+    println("Waiting for 2")
+    2
+  }
+
+  private val future3 = Future {
+    Thread.sleep(1000)
+    println("Waiting for 3")
+    "3"
+  }
+
+  private val future4 = Future {
+    Thread.sleep(2000)
+    println("Waiting for 4")
+    4
+  }
+
+  "Applicative Functor extension" should {
 
     "applicatives with apply over" in {
       val function: Int => Int => String => String = { (x: Int) => y: Int => z: String => s"$x - $y - $z" }
-      val f1 = Future(3)
-      val f2 = Future(4)
-      val f3 = Future("5")
 
       val applicativeResult = Future(function)
-        .applyOver(f1)
-        .applyOver(f2)
-        .applyOver(f3)
+        .applyOver(future1)
+        .applyOver(future2)
+        .applyOver(future3)
 
       val result = Await.result(
         applicativeResult, 10 seconds
@@ -34,14 +55,11 @@ class ApplicativeFunctorTest extends PlaySpec with GuiceOneAppPerTest with Injec
 
     "applicatives with zip with" in {
       val function: Int => Int => String => String = { (x: Int) => y: Int => z: String => s"$x - $y - $z" }
-      val f1 = Future(3)
-      val f2 = Future(4)
-      val f3 = Future("5")
 
       val applicativeResult = Future(function)
-        .zipOver(f1)
-        .zipOver(f2)
-        .zipOver(f3)
+        .zipOver(future1)
+        .zipOver(future2)
+        .zipOver(future3)
 
       val result = Await.result(
         applicativeResult, 10 seconds
@@ -52,42 +70,22 @@ class ApplicativeFunctorTest extends PlaySpec with GuiceOneAppPerTest with Injec
 
     "applicatives with zip with and apply over" in {
       val function = { x: Int => y: Int => z: String => x1: Int => s"$x - $y - $z - $x1" }
-      val f1 = Future {
-        Thread.sleep(1000)
-        println("Waiting for 1")
-        1
-      }
-      val f2 = Future {
-        Thread.sleep(3000)
-        println("Waiting for 2")
-        2
-      }
-      val f3 = Future {
-        Thread.sleep(1000)
-        println("Waiting for 3")
-        "3"
-      }
-      val f4 = Future {
-        Thread.sleep(2000)
-        println("Waiting for 4")
-        4
-      }
 
       val applicativeResult = Future(function)
-        .zipOver(f1)
-        .applyOver(f2)
-        .applyOver(f3)
-        .applyOver(f4)
+        .zipOver(future1)
+        .applyOver(future2)
+        .applyOver(future3)
+        .applyOver(future4)
 
       val result = Await.result(
         applicativeResult, 10 seconds
       )
 
       print(for {
-        v1 <- f1
-        v2 <- f2
-        v3 <- f3
-        v4 <- f4
+        v1 <- future1
+        v2 <- future2
+        v3 <- future3
+        v4 <- future4
       } function(v1)(v2)(v3)(v4)
       )
 
@@ -96,39 +94,18 @@ class ApplicativeFunctorTest extends PlaySpec with GuiceOneAppPerTest with Injec
 
     "applicatives with for comprehension" in {
       val function = { x: Int => y: Int => z: String => x1: Int => s"$x - $y - $z - $x1" }
-      val f1 = Future {
-        Thread.sleep(1000)
-        println("Waiting for 1")
-        1
-      }
-      val f2 = Future {
-        Thread.sleep(3000)
-        println("Waiting for 2")
-        2
-      }
-      val f3 = Future {
-        Thread.sleep(1000)
-        println("Waiting for 3")
-        "3"
-      }
-      val f4 = Future {
-        Thread.sleep(2000)
-        println("Waiting for 4")
-        4
-      }
 
       val result = for {
-        v1 <- f1
-        v2 <- f2
-        v3 <- f3
-        v4 <- f4
+        v1 <- future1
+        v2 <- future2
+        v3 <- future3
+        v4 <- future4
       } yield function(v1)(v2)(v3)(v4)
 
       Await.result(
         result, 10 seconds
       )
     }
-
   }
 }
 
