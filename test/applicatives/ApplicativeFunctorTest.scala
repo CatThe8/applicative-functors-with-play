@@ -73,25 +73,62 @@ class ApplicativeFunctorTest extends PlaySpec with GuiceOneAppPerTest with Injec
         4
       }
 
-      for {
-        v1 <- f1
-        v2 <- f2
-        v3 <- f3
-        v4 <- f4
-      } yield (function(v1)(v2)(v3)(v4))
-
       val applicativeResult = Future(function)
         .zipOver(f1)
         .applyOver(f2)
         .applyOver(f3)
-        .zipOver(f4)
+        .applyOver(f4)
 
       val result = Await.result(
         applicativeResult, 10 seconds
       )
 
+      print(for {
+        v1 <- f1
+        v2 <- f2
+        v3 <- f3
+        v4 <- f4
+      } function(v1)(v2)(v3)(v4)
+      )
+
       println(result)
     }
+
+    "applicatives with for comprehension" in {
+      val function = { x: Int => y: Int => z: String => x1: Int => s"$x - $y - $z - $x1" }
+      val f1 = Future {
+        Thread.sleep(1000)
+        println("Waiting for 1")
+        1
+      }
+      val f2 = Future {
+        Thread.sleep(3000)
+        println("Waiting for 2")
+        2
+      }
+      val f3 = Future {
+        Thread.sleep(1000)
+        println("Waiting for 3")
+        "3"
+      }
+      val f4 = Future {
+        Thread.sleep(2000)
+        println("Waiting for 4")
+        4
+      }
+
+      val result = for {
+        v1 <- f1
+        v2 <- f2
+        v3 <- f3
+        v4 <- f4
+      } yield function(v1)(v2)(v3)(v4)
+
+      Await.result(
+        result, 10 seconds
+      )
+    }
+
   }
 }
 
