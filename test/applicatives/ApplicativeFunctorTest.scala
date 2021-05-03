@@ -73,11 +73,18 @@ class ApplicativeFunctorTest extends PlaySpec with GuiceOneAppPerTest with Injec
         4
       }
 
+      for {
+        v1 <- f1
+        v2 <- f2
+        v3 <- f3
+        v4 <- f4
+      } yield (function(v1)(v2)(v3)(v4))
+
       val applicativeResult = Future(function)
-        .applyOver(f1)
+        .zipOver(f1)
         .applyOver(f2)
         .applyOver(f3)
-        .applyOver(f4)
+        .zipOver(f4)
 
       val result = Await.result(
         applicativeResult, 10 seconds
