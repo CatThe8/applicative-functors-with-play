@@ -4,7 +4,7 @@ object Solution {
   def solution(a: Array[Int]): Int = {
     var arrays: Array[Array[Int]] = Array[Array[Int]]()
     var array: Array[Int] = Array[Int]()
-    var distinct = a.distinct
+    val distinct = a.distinct
 
     for (index <- a.indices) {
       val ls1: Array[Int] = a.drop(index)
