@@ -1,6 +1,6 @@
 package exercises
 
-import scala.util.control.Breaks
+import scala.util.Random
 
 /**
  * This is a demo task.
@@ -25,25 +25,26 @@ import scala.util.control.Breaks
 
 object Solution {
   def solution(list: Array[Int]): Int = {
+    val minimumAccepted = 1
     scala.util.Sorting.quickSort(list)
 
-    if (!list.contains(1) && list.exists(_ > 1)) return 1
+    val filteredList = list.dropWhile(_ <= 0)
+    if (!filteredList.contains(minimumAccepted) && filteredList.exists(_ > minimumAccepted)) return minimumAccepted
 
-    val loop = new Breaks
-    for ((elem, index) <- list.view.zipWithIndex) {
-      loop.breakable {
-        if (elem < 0) loop.break
-        if (index + 1 == list.length) return elem + 1
-        if (elem + 1 == list(index + 1) || elem == list(index + 1)) loop.break
-        return elem + 1
-      }
+    for ((elem, index) <- filteredList.view.zipWithIndex) {
+      val nextIndex = index + 1
+      val result = elem + 1
+      val nextElement = if (nextIndex == filteredList.length) return result else filteredList(nextIndex)
+      if (result != nextElement && elem != nextElement) return result
     }
-    1
+    minimumAccepted
   }
 }
 
 object main {
   def main(args: Array[String]): Unit = {
+    val list1 = Random.shuffle(Array.range(1, 100000)).toArray
+    val list2 = Random.shuffle(Array.range(-1000000, 1000000)).toArray
     println(Solution.solution(Array(1, 3, 6, 4, 1, 2)) + " Should be 5")
     println(Solution.solution(Array(6, 3, 1)) + " Should be 2")
     println(Solution.solution(Array(6, 3, 2)) + " Should be 1")
@@ -59,15 +60,14 @@ object main {
     println(Solution.solution(Array(1, -1, -2, -5)) + " Should be 2")
     println(Solution.solution(Array(2, 3, 5, 5, 6, 7, -1, -2, -6)) + " Should be 1")
     println(Solution.solution(Array(2, -1, -2, -5)) + " Should be 1")
+    println(Solution.solution(Array(2, 2, 2, -1, -2, -5)) + " Should be 1")
     println(Solution.solution(Array(3, -1, -2, -5)) + " Should be 1")
     println(Solution.solution(Array(9, -1, -2, -5)) + " Should be 1")
     val time1 = System.currentTimeMillis()
-    println("Time start 1: " + time1)
-    println(Solution.solution(Array.range(1, 100000)) + "Should be perform")
-    val time12 = System.currentTimeMillis()
-    println("Time end 1: " + (time1 - time12))
-    println("Time start 2: " + time12)
-    println(Solution.solution(Array.range(-1000000, 1000000)) + "Should be perform")
-    println("Time start 2: " + (time12 - System.currentTimeMillis()))
+    println(Solution.solution(list1) + " Should be performant")
+    val time2 = System.currentTimeMillis()
+    println("Time end 1: " + (time1 - time2))
+    println(Solution.solution(list2) + " Should be performant")
+    println("Time start 2: " + (time2 - System.currentTimeMillis()))
   }
 }
