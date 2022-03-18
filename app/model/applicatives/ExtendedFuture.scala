@@ -9,8 +9,7 @@ class ExtendedFuture[A, B](applicativeFunctor: Future[A => B]) {
     f => other.map(f(_))
   )
 
-  def zipOver(other: Future[A]): Future[B] = applicativeFunctor.
-    zipWith(other)({ (f: A => B, r: A) => f(r) })
+  def zipOver(other: Future[A]): Future[B] = applicativeFunctor.zipWith(other)(_.apply(_))
 }
 
 object ImplicitsFutures {
