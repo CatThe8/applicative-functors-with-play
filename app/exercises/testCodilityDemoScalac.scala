@@ -25,19 +25,21 @@ import scala.util.Random
 
 object Solution {
   def solution(list: Array[Int]): Int = {
-    val minimumAccepted = 1
+    val minAcceptedSolution = 1
     scala.util.Sorting.quickSort(list)
 
     val filteredList = list.dropWhile(_ <= 0)
-    if (!filteredList.contains(minimumAccepted) && filteredList.exists(_ > minimumAccepted)) return minimumAccepted
+    if (filteredList.headOption.getOrElse(0) != 1) return minAcceptedSolution
 
     for ((elem, index) <- filteredList.view.zipWithIndex) {
       val nextIndex = index + 1
       val result = elem + 1
-      val nextElement = if (nextIndex == filteredList.length) return result else filteredList(nextIndex)
-      if (result != nextElement && elem != nextElement) return result
+      val isLastElem = nextIndex == filteredList.length
+      if (isLastElem) return result
+      val nextElement =  filteredList(nextIndex)
+      if (elem != nextElement &&  result != nextElement) return result
     }
-    minimumAccepted
+    minAcceptedSolution
   }
 }
 
@@ -45,6 +47,8 @@ object main {
   def main(args: Array[String]): Unit = {
     val list1 = Random.shuffle(Array.range(1, 100000)).toArray
     val list2 = Random.shuffle(Array.range(-1000000, 1000000)).toArray
+    val list3 = Random.shuffle(Array.range(2, 100000).concat(Array.range(-100000, 0))).toArray
+
     println(Solution.solution(Array(1, 3, 6, 4, 1, 2)) + " Should be 5")
     println(Solution.solution(Array(6, 3, 1)) + " Should be 2")
     println(Solution.solution(Array(6, 3, 2)) + " Should be 1")
@@ -68,6 +72,9 @@ object main {
     val time2 = System.currentTimeMillis()
     println("Time end 1: " + (time1 - time2))
     println(Solution.solution(list2) + " Should be performant")
-    println("Time start 2: " + (time2 - System.currentTimeMillis()))
+    val time3 = System.currentTimeMillis()
+    println("Time start 2: " + (time2 - time3))
+    println(Solution.solution(list3) + " Should be performant")
+    println("Time start 3: " + (time3 - System.currentTimeMillis()))
   }
 }
